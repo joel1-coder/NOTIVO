@@ -114,6 +114,7 @@ body {
   align-items: center;
   gap: 16px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 .bell-btn {
   position: relative;

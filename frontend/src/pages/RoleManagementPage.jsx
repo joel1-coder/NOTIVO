@@ -34,6 +34,12 @@ const XIcon = () => (
     <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 );
+const TrashIcon = () => (
+  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+    <polyline points="3 6 5 6 21 6"/>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  </svg>
+);
 const CheckIcon = () => (
   <svg width="16" height="16" fill="none" stroke="white" strokeWidth="2.5" viewBox="0 0 24 24">
     <polyline points="20 6 9 17 4 12"/>
@@ -67,6 +73,7 @@ export default function RoleManagementPage() {
   const [showModal, setShowModal]   = useState(false);
   const [editUser, setEditUser]     = useState(null);   // user being edited
   const [success, setSuccess]       = useState("");
+  const [removeId, setRemoveId]     = useState(null);   // id pending removal confirm
 
   /* New user form state */
   const emptyForm = { firstName:"", lastName:"", staffId:"", email:"", dob:"", dept: departments[0], role:"HOD" };
@@ -144,6 +151,14 @@ export default function RoleManagementPage() {
 
   const openAdd = () => { setForm(emptyForm); setEditUser(null); setErrors({}); setShowModal(true); };
   const closeModal = () => { setShowModal(false); setEditUser(null); setErrors({}); setForm(emptyForm); };
+
+  /* Remove user */
+  const handleRemove = (id) => {
+    setUsers(prev => prev.filter(u => u.id !== id));
+    setRemoveId(null);
+    setSuccess("User removed successfully!");
+    setTimeout(() => setSuccess(""), 3000);
+  };
 
   return (
     <Layout>
@@ -243,7 +258,7 @@ export default function RoleManagementPage() {
                       </span>
                     </td>
                     <td>
-                      <div style={{ display: "flex", gap: 6 }}>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
                         <button className="view-details-btn" onClick={() => openEdit(u)}>
                           <EditIcon /> Edit
                         </button>
@@ -253,6 +268,17 @@ export default function RoleManagementPage() {
                         >
                           <PowerIcon /> {u.status === "Active" ? "Deactivate" : "Activate"}
                         </button>
+                        {removeId === u.id ? (
+                          <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                            <span style={{ fontSize: 12, color: "#B91C1C", fontWeight: 600 }}>Sure?</span>
+                            <button className="rm-confirm-delete-btn" onClick={() => handleRemove(u.id)}>Yes</button>
+                            <button className="rm-cancel-delete-btn" onClick={() => setRemoveId(null)}>No</button>
+                          </div>
+                        ) : (
+                          <button className="rm-remove-btn" onClick={() => setRemoveId(u.id)}>
+                            <TrashIcon /> Remove
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
