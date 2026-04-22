@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
+import ViewModal from "../components/ViewModal";
 
 /* ── Icons ─────────────────────────────────── */
 const FilterIcon = () => (
@@ -166,6 +167,7 @@ export default function PendingTasksPage() {
   const [search, setSearch]       = useState("");
   const [deptFilter, setDept]     = useState("All");
   const [showOverdue, setOverdue] = useState(false);
+  const [modalItem, setModalItem] = useState(null);
 
   const filtered = pendingTasks.filter((t) => {
     const matchSearch =
@@ -323,7 +325,7 @@ export default function PendingTasksPage() {
                       </span>
                     </td>
                     <td>
-                      <button className="view-details-btn">
+                      <button className="view-details-btn" onClick={() => setModalItem(t)}>
                         <EyeIcon /> View Details
                       </button>
                     </td>
@@ -347,6 +349,7 @@ export default function PendingTasksPage() {
           </div>
         </div>
       </div>
+      {modalItem && <ViewModal item={modalItem} type="task" onClose={() => setModalItem(null)} />}
     </Layout>
   );
 }

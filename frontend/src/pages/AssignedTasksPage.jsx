@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
+import ViewModal from "../components/ViewModal";
 
 /* ── Icons ─────────────────────────────────── */
 const FilterIcon = () => (
@@ -151,6 +152,7 @@ export default function AssignedTasksPage() {
   const [search, setSearch] = useState("");
   const [deptFilter, setDeptFilter] = useState("All");
   const [staffFilter, setStaffFilter] = useState("All Members");
+  const [modalItem, setModalItem] = useState(null);
 
   const filtered = tasks.filter((t) => {
     const matchSearch =
@@ -293,7 +295,7 @@ export default function AssignedTasksPage() {
                     </td>
                     <td className="date-cell">{t.due}</td>
                     <td>
-                      <button className="view-details-btn">
+                      <button className="view-details-btn" onClick={() => setModalItem(t)}>
                         <EyeIcon /> View Details
                       </button>
                     </td>
@@ -318,6 +320,7 @@ export default function AssignedTasksPage() {
           </div>
         </div>
       </div>
+      {modalItem && <ViewModal item={modalItem} type="task" onClose={() => setModalItem(null)} />}
     </Layout>
   );
 }
