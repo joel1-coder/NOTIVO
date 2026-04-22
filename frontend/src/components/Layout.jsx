@@ -63,11 +63,6 @@ export default function Layout({ children }) {
           <NavLink to="/reminders"       className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Reminder</NavLink>
         </nav>
 
-        {/* Search */}
-        <div className="navbar-search">
-          <SearchIcon />
-          <input type="text" placeholder="Search across platform..." className="search-input" />
-        </div>
 
         {/* Right: Bell + Avatar */}
         <div className="navbar-right">
