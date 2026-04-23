@@ -41,11 +41,11 @@ const ExpandIcon = () => (
   </svg>
 );
 
-const statusBadge = {
-  "Pending Review": { bg: "#FEF3C7", color: "#92400E" },
-  Approved:         { bg: "#DCFCE7", color: "#166534" },
-  Rejected:         { bg: "#FEE2E2", color: "#B91C1C" },
-  "Under Review":   { bg: "#DBEAFE", color: "#1D4ED8" },
+const statusClass = {
+  "Pending Review": "dr-badge-amber",
+  "Approved":       "dr-badge-green",
+  "Rejected":       "dr-badge-red",
+  "Under Review":   "dr-badge-blue",
 };
 
 export default function DocumentReviewPage() {
@@ -110,8 +110,8 @@ export default function DocumentReviewPage() {
                     <div className="docrev-item-info">
                       <div className="docrev-item-name">{sub.eventName}</div>
                       <div className="docrev-item-dept">{sub.dept}</div>
-                      <span className="task-status-badge"
-                        style={{ background: badge.bg, color: badge.color, marginTop: 4, display: "inline-block" }}>
+                      <span className={`task-status-badge ${statusClass[sub.status] || "dr-badge-amber"}`}
+                        style={{ marginTop:4, display:"inline-block" }}>
                         {sub.status}
                       </span>
                     </div>
@@ -123,21 +123,20 @@ export default function DocumentReviewPage() {
 
           {/* RIGHT — Review Panel */}
           {selected && (() => {
-            const badge = statusBadge[selected.status] || statusBadge["Pending Review"];
             return (
               <div className="docrev-review-panel">
                 {/* Document Preview */}
                 <div className="docrev-preview-card">
                   <div className="docrev-preview-topbar">
                     <span className="docrev-filename">{selected.file}</span>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                      <span className="task-status-badge" style={{ background: badge.bg, color: badge.color }}>
+                    <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+                      <span className={`task-status-badge ${statusClass[selected.status] || "dr-badge-amber"}`}>
                         {selected.status}
                       </span>
                       <button className="docrev-view-btn"
-                        style={{ padding: "5px 12px", fontSize: 12, display:"flex", alignItems:"center", gap:5 }}
+                        style={{ padding:"5px 12px", fontSize:12, display:"flex", alignItems:"center", gap:5 }}
                         onClick={() => handleViewFullDetails(selected)}>
-                        <ExpandIcon /> Full Details
+                        <ExpandIcon/> Full Details
                       </button>
                     </div>
                   </div>
