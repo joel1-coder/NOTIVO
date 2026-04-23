@@ -1,14 +1,40 @@
 services:
   - type: web
+    name: notivo-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "18"
+      - key: MONGODB_URI
+        fromDatabase:
+          name: notivo-db
+          property: connectionString
+      - key: PORT
+        value: "10000"
+    
+  - type: web
     name: notivo-frontend
     env: node
     plan: free
     buildCommand: cd frontend && npm install && npm run build
     startCommand: cd frontend && npx serve -s dist -l 3000
-    staticPublishPath: frontend/dist
     envVars:
       - key: NODE_VERSION
         value: "18"
+      - key: VITE_API_URL
+        value: https://notivo-backend.onrender.com
     routes:
       - path: /
-        destination: /index.html
+        destination: notivo-frontend
+      - path: /api
+        destination: notivo-backend
+
+  - type: pserv
+    name: notivo-db
+    plan: free
+    ipAllowList:
+      - src: 0.0.0.0/0
+        description: Allow all
