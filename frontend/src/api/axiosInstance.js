@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL || "https://notivo-7ln4.onrender.com/api";
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  baseURL: API_URL,
 });
 
 axiosInstance.interceptors.request.use((config) => {
