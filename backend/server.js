@@ -9,42 +9,64 @@ connectDB();
 
 const app = express();
 
-// CORS Configuration for Development & Production
 const allowedOrigins = [
-  // Production URLs
   "https://notivo-adminlog.vercel.app",
   process.env.CLIENT_URL,
-  // Development URLs
   "http://localhost:5173",
   "http://localhost:3000",
   "http://127.0.0.1:5173",
 ].filter(Boolean);
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+
+  return (
+    allowedOrigins.includes(origin) ||
+    origin.endsWith(".vercel.app") ||
+    origin.includes("localhost") ||
+    origin.includes("127.0.0.1")
+  );
+};
+
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
-
-    const isAllowed = 
-      allowedOrigins.includes(origin) || 
-      origin.endsWith(".vercel.app") || 
-      origin.includes("localhost") || 
-      origin.includes("127.0.0.1");
-
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      console.error(`CORS blocked request from: ${origin}`);
-      callback(new Error("Not allowed by CORS"));
+  origin(origin, callback) {
+    if (isAllowedOrigin(origin)) {
+      return callback(null, true);
     }
+
+    console.error(`CORS blocked request from: ${origin}`);
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  optionsSuccessStatus: 204,
 };
 
-// Handle all preflight OPTIONS requests globally
-app.options("*", cors(corsOptions));
+app.use((req, res, next) => {
+  const requestOrigin = req.headers.origin;
+
+  if (isAllowedOrigin(requestOrigin)) {
+    res.header("Access-Control-Allow-Origin", requestOrigin || "*");
+    res.header("Vary", "Origin");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,DELETE,OPTIONS"
+    );
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Requested-With"
+    );
+  }
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  return next();
+});
+
 app.use(cors(corsOptions));
 app.use(express.json());
 

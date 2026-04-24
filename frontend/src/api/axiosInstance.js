@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "https://notivo-7ln4.onrender.com";
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://notivo-api.onrender.com";
 
 const axiosInstance = axios.create({
   // Ensure we always have the /api suffix
