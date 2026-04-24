@@ -3,38 +3,21 @@ services:
     name: notivo-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: "18"
-      - key: MONGODB_URI
-        fromDatabase:
-          name: notivo-db
-          property: connectionString
       - key: PORT
         value: "10000"
-    
-  - type: web
-    name: notivo-frontend
-    env: node
-    plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    startCommand: cd frontend && npx serve -s dist -l 3000
-    envVars:
-      - key: NODE_VERSION
-        value: "18"
-      - key: VITE_API_URL
-        value: https://notivo-backend.onrender.com
-    routes:
-      - path: /
-        destination: notivo-frontend
-      - path: /api
-        destination: notivo-backend
-
-  - type: pserv
-    name: notivo-db
-    plan: free
-    ipAllowList:
-      - src: 0.0.0.0/0
-        description: Allow all
+      - key: MONGO_URI
+        sync: false   # Set this in Render Dashboard → Environment
+      - key: JWT_SECRET
+        sync: false   # Set this in Render Dashboard → Environment
+      - key: CLIENT_URL
+        value: "https://notivo-adminlog.vercel.app"
+      - key: EMAIL_USER
+        sync: false   # Set this in Render Dashboard → Environment
+      - key: EMAIL_PASS
+        sync: false   # Set this in Render Dashboard → Environment
