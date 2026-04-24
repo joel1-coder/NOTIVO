@@ -20,7 +20,7 @@ const allowedOrigins = [
   "http://127.0.0.1:5173",
 ].filter(Boolean);
 
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
     // Allow no origin (like mobile apps or Postman)
     if (!origin) {
@@ -53,7 +53,11 @@ app.use(cors({
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-}));
+};
+
+// Handle all preflight OPTIONS requests globally (must be before other routes)
+app.options("*", cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth", require("./routes/authroutes"));
