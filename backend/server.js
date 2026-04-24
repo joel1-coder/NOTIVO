@@ -22,40 +22,28 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow no origin (like mobile apps or Postman)
-    if (!origin) {
-      callback(null, true);
-      return;
-    }
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
 
-    // Check if origin is in whitelist
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-      return;
-    }
+    const isAllowed = 
+      allowedOrigins.includes(origin) || 
+      origin.endsWith(".vercel.app") || 
+      origin.includes("localhost") || 
+      origin.includes("127.0.0.1");
 
-    // Allow all Vercel preview deployments (*.vercel.app)
-    if (origin.endsWith(".vercel.app")) {
+    if (isAllowed) {
       callback(null, true);
-      return;
+    } else {
+      console.error(`CORS blocked request from: ${origin}`);
+      callback(new Error("Not allowed by CORS"));
     }
-
-    // Allow localhost for development
-    if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
-      callback(null, true);
-      return;
-    }
-
-    // Block everything else
-    console.error(`CORS blocked request from: ${origin}`);
-    callback(new Error("CORS policy: Origin not allowed"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
 
-// Handle all preflight OPTIONS requests globally (must be before other routes)
+// Handle all preflight OPTIONS requests globally
 app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
 app.use(express.json());
