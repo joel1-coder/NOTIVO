@@ -399,9 +399,265 @@ body { font-family: var(--font); background: var(--bg); color: var(--gray-900); 
 }
 .logout-btn:hover { background: var(--red); color: white; border-color: var(--red); }
 
+.logout-btn:hover { background: var(--red); color: white; border-color: var(--red); }
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE STYLES - AUTH PAGES
+═══════════════════════════════════════════════ */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .auth-page {
+    padding: 20px;
+  }
+  
+  .auth-card {
+    padding: 40px 36px;
+    max-width: 420px;
+  }
+}
+
+/* Mobile (600px - 768px) */
+@media (max-width: 768px) {
+  .auth-page {
+    padding: 16px;
+  }
+  
+  .auth-card {
+    padding: 32px 28px;
+    max-width: 100%;
+    border-radius: 12px;
+  }
+  
+  .auth-logo {
+    margin-bottom: 28px;
+  }
+  
+  .auth-logo-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .auth-logo-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .auth-logo-text {
+    font-size: 18px;
+  }
+  
+  .auth-title {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+  
+  .auth-subtitle {
+    font-size: 13px;
+    margin-bottom: 28px;
+  }
+  
+  .form-group {
+    margin-bottom: 18px;
+  }
+  
+  .form-label {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .form-input {
+    font-size: 14px;
+    padding: 11px 12px 11px 38px;
+    border-radius: 8px;
+  }
+  
+  .input-icon {
+    width: 16px;
+    height: 16px;
+    left: 12px;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    padding: 11px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+}
+
+/* Small Mobile (up to 600px) */
+@media (max-width: 600px) {
+  .auth-page {
+    padding: 12px;
+    min-height: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .auth-card {
+    padding: 28px 20px;
+    max-width: 100%;
+    border-radius: 12px;
+  }
+  
+  .auth-logo {
+    margin-bottom: 24px;
+  }
+  
+  .auth-logo-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .auth-logo-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .auth-logo-text {
+    font-size: 16px;
+  }
+  
+  .auth-title {
+    font-size: 20px;
+    margin-bottom: 3px;
+  }
+  
+  .auth-subtitle {
+    font-size: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-label {
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+  
+  .input-wrapper {
+    position: relative;
+  }
+  
+  .form-input {
+    font-size: 13px;
+    padding: 10px 12px 10px 36px;
+    border-radius: 8px;
+    height: 42px;
+  }
+  
+  .input-icon {
+    width: 16px;
+    height: 16px;
+    left: 12px;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+  
+  .btn-secondary {
+    margin-top: 10px;
+  }
+  
+  .divider {
+    margin: 18px 0;
+  }
+  
+  .forgot-password-link {
+    font-size: 12px;
+  }
+}
+
+/* Extra Small Mobile (up to 480px) */
 @media (max-width: 480px) {
-  .auth-card { padding: 32px 24px; }
-  .otp-input { width: 44px; height: 52px; font-size: 18px; }
-  .dashboard-body { padding: 24px 16px; }
-  .dashboard-header { padding: 0 16px; }
+  .auth-page {
+    padding: 10px;
+  }
+  
+  .auth-card {
+    padding: 24px 16px;
+    border-radius: 12px;
+  }
+  
+  .auth-logo {
+    margin-bottom: 20px;
+  }
+  
+  .auth-logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .auth-logo-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .auth-logo-text {
+    font-size: 14px;
+  }
+  
+  .auth-title {
+    font-size: 18px;
+    margin-bottom: 3px;
+  }
+  
+  .auth-subtitle {
+    font-size: 11px;
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 14px;
+  }
+  
+  .form-label {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+  
+  .form-input {
+    font-size: 12px;
+    padding: 9px 10px 9px 34px;
+    height: 40px;
+  }
+  
+  .input-icon {
+    width: 14px;
+    height: 14px;
+    left: 10px;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+  
+  .divider {
+    margin: 16px 0;
+  }
+  
+  .otp-input {
+    width: 40px;
+    height: 48px;
+    font-size: 16px;
+    border-radius: 7px;
+  }
+  
+  .dashboard-body {
+    padding: 16px 10px;
+  }
+  
+  .dashboard-header {
+    padding: 0 10px;
+    height: 48px;
+  }
 }

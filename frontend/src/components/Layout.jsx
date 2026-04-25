@@ -37,6 +37,7 @@ export default function Layout({ children }) {
   const { admin, logout } = useAuth();
   const navigate = useNavigate();
   const [dropOpen, setDropOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate("/login"); };
 
@@ -48,6 +49,17 @@ export default function Layout({ children }) {
     <div className="layout-root">
       {/* ── TOP NAVBAR ─────────────────────────────── */}
       <header className="top-navbar">
+        {/* Hamburger Menu */}
+        <button 
+          className="hamburger-btn"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </button>
+
         {/* Logo */}
         <div className="navbar-logo">
           <ShieldIcon />
@@ -124,6 +136,45 @@ export default function Layout({ children }) {
           </div>
         </div>
       </header>
+
+      {/* Mobile Navigation Menu */}
+      <nav className={`mobile-nav-menu ${mobileMenuOpen ? 'open' : ''}`}>
+        <NavLink 
+          to="/dashboard" 
+          className={({ isActive }) => isActive ? "mobile-nav-item active" : "mobile-nav-item"}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Dashboard
+        </NavLink>
+        <NavLink 
+          to="/submissions" 
+          className={({ isActive }) => isActive ? "mobile-nav-item active" : "mobile-nav-item"}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Events
+        </NavLink>
+        <NavLink 
+          to="/content-monitor" 
+          className={({ isActive }) => isActive ? "mobile-nav-item active" : "mobile-nav-item"}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Content
+        </NavLink>
+        <NavLink 
+          to="/roles" 
+          className={({ isActive }) => isActive ? "mobile-nav-item active" : "mobile-nav-item"}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Roles
+        </NavLink>
+        <NavLink 
+          to="/reminders" 
+          className={({ isActive }) => isActive ? "mobile-nav-item active" : "mobile-nav-item"}
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Reminders
+        </NavLink>
+      </nav>
 
       {/* ── PAGE CONTENT ───────────────────────────── */}
       <main className="layout-main">

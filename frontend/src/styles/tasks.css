@@ -679,3 +679,337 @@
   transition: background 0.2s;
 }
 .vm-footer-close:hover { background: #2563EB; }
+
+/* ═══════════════════════════════════════════════
+   MOBILE RESPONSIVE STYLES - TASKS PAGES
+═══════════════════════════════════════════════ */
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .tasks-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  
+  .tasks-table th,
+  .tasks-table td {
+    padding: 12px 12px;
+    font-size: 12px;
+  }
+}
+
+/* Mobile (600px - 768px) */
+@media (max-width: 768px) {
+  .tasks-page {
+    max-width: 100%;
+    gap: 16px;
+  }
+  
+  .tasks-header-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .tasks-title {
+    font-size: 22px;
+  }
+  
+  .tasks-subtitle {
+    font-size: 12px;
+  }
+  
+  .tasks-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .tasks-stat-card {
+    padding: 16px 14px;
+  }
+  
+  .tsc-value {
+    font-size: 26px;
+  }
+  
+  .tsc-label {
+    font-size: 11px;
+  }
+  
+  .breadcrumb {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .tasks-table {
+    font-size: 12px;
+  }
+  
+  .tasks-table th {
+    font-size: 10px;
+    padding: 10px 8px;
+  }
+  
+  .tasks-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+  
+  .completed-stats-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .completed-stat-card {
+    padding: 16px 14px;
+  }
+  
+  .csc-value {
+    font-size: 28px;
+  }
+}
+
+/* Small Mobile (up to 600px) */
+@media (max-width: 600px) {
+  .tasks-page {
+    gap: 12px;
+  }
+  
+  .tasks-header-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .tasks-title {
+    font-size: 20px;
+  }
+  
+  .tasks-subtitle {
+    font-size: 11px;
+  }
+  
+  .breadcrumb {
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+  
+  .tasks-stat-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .tasks-stat-card {
+    padding: 14px 12px;
+    gap: 6px;
+  }
+  
+  .tsc-top {
+    gap: 6px;
+  }
+  
+  .tsc-label {
+    font-size: 10px;
+  }
+  
+  .tsc-change {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  
+  .tsc-value {
+    font-size: 24px;
+    letter-spacing: -0.5px;
+  }
+  
+  .tasks-table {
+    width: 100%;
+    font-size: 11px;
+  }
+  
+  .tasks-table th {
+    font-size: 9px;
+    padding: 8px 6px;
+  }
+  
+  .tasks-table td {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+  
+  .assignee-avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 9px;
+  }
+  
+  .status-badge {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+  
+  .completed-stats-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .completed-stat-card {
+    padding: 14px 12px;
+  }
+  
+  .csc-label {
+    font-size: 11px;
+  }
+  
+  .csc-value {
+    font-size: 26px;
+  }
+  
+  .csc-sub {
+    font-size: 11px;
+  }
+  
+  .reason-failed,
+  .reason-cancelled,
+  .reason-notstarted {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  
+  .note-cell {
+    font-size: 11px;
+    max-width: 100px;
+  }
+  
+  .retry-btn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  
+  .incomplete-badge-summary {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+  
+  /* Modal */
+  .vm-modal {
+    max-width: 95%;
+  }
+  
+  .vm-header {
+    padding: 16px 18px;
+  }
+  
+  .vm-header-icon {
+    font-size: 24px;
+  }
+  
+  .vm-header-title {
+    font-size: 14px;
+    max-width: 200px;
+  }
+  
+  .vm-header-sub {
+    font-size: 11px;
+  }
+  
+  .vm-close-btn {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .vm-body {
+    padding: 16px 18px;
+  }
+  
+  .vm-details-grid {
+    grid-template-columns: 1fr;
+    gap: 8px 12px;
+    padding: 12px;
+  }
+  
+  .vm-label {
+    font-size: 9px;
+  }
+  
+  .vm-value {
+    font-size: 12px;
+  }
+  
+  .vm-message-box {
+    padding: 14px 16px;
+    font-size: 12px;
+  }
+  
+  .vm-footer {
+    padding: 12px 18px;
+  }
+  
+  .vm-footer-close {
+    padding: 8px 18px;
+    font-size: 12px;
+  }
+}
+
+/* Extra Small Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .tasks-page {
+    gap: 10px;
+  }
+  
+  .tasks-title {
+    font-size: 18px;
+  }
+  
+  .tasks-stat-grid {
+    gap: 8px;
+  }
+  
+  .tasks-stat-card {
+    padding: 12px 10px;
+  }
+  
+  .tsc-value {
+    font-size: 22px;
+  }
+  
+  .tasks-table th,
+  .tasks-table td {
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+  
+  .completed-stat-card {
+    padding: 12px 10px;
+  }
+  
+  .csc-value {
+    font-size: 24px;
+  }
+  
+  .vm-modal {
+    max-width: 100%;
+    border-radius: 12px;
+    max-height: 95vh;
+  }
+  
+  .vm-header {
+    padding: 12px 14px;
+  }
+  
+  .vm-header-icon {
+    font-size: 20px;
+  }
+  
+  .vm-header-title {
+    font-size: 13px;
+    max-width: 160px;
+  }
+  
+  .vm-body {
+    padding: 14px 14px;
+  }
+  
+  .vm-details-grid {
+    padding: 10px;
+    gap: 6px 10px;
+  }
+}
