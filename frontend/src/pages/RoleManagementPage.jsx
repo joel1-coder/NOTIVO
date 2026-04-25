@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
+import axiosInstance from "../api/axiosInstance";
 
 /* ── Icons ──────────────────────────────────── */
 const ChevronRight = () => (
@@ -52,33 +53,43 @@ const UserIcon = () => (
   </svg>
 );
 
-/* ── Initial user data ──────────────────────── */
-const initUsers = [
-  { id: "USR-001", name: "Alex Rivera",   email: "alex.rivera@notivo.edu",   role: "Admin", dept: "Administration", status: "Active",   avatarBg: "#2563EB", initials: "AR" },
-  { id: "USR-002", name: "Dr. Priya Nair", email: "priya.nair@notivo.edu",  role: "HOD",   dept: "Mechanical Engg", status: "Active",   avatarBg: "#8B5CF6", initials: "PN" },
-  { id: "USR-003", name: "James Okafor",  email: "james.okafor@notivo.edu", role: "HOD",   dept: "Human Resources", status: "Active",   avatarBg: "#F97316", initials: "JO" },
-  { id: "USR-004", name: "Sarah Jenkins", email: "sarah.j@notivo.edu",      role: "HOD",   dept: "Computer Science", status: "Inactive", avatarBg: "#10B981", initials: "SJ" },
-  { id: "USR-005", name: "Robert Chen",   email: "r.chen@notivo.edu",       role: "Admin", dept: "Administration", status: "Active",   avatarBg: "#EF4444", initials: "RC" },
-  { id: "USR-006", name: "Linda Torres",  email: "l.torres@notivo.edu",     role: "HOD",   dept: "Legal",           status: "Active",   avatarBg: "#06B6D4", initials: "LT" },
-  { id: "USR-007", name: "David Miller",  email: "d.miller@notivo.edu",     role: "HOD",   dept: "Finance",         status: "Inactive", avatarBg: "#F59E0B", initials: "DM" },
-];
-
 const departments = ["Administration","Mechanical Engg","Human Resources","Computer Science","Legal","Finance","Marketing","Engineering"];
 
 /* ── Component ──────────────────────────────── */
 export default function RoleManagementPage() {
-  const [users, setUsers]           = useState(initUsers);
+  const [users, setUsers]           = useState([]);
+  const [loading, setLoading]       = useState(true);
   const [search, setSearch]         = useState("");
   const [roleFilter, setRoleFilter] = useState("All");
   const [showModal, setShowModal]   = useState(false);
-  const [editUser, setEditUser]     = useState(null);   // user being edited
+  const [editUser, setEditUser]     = useState(null);
   const [success, setSuccess]       = useState("");
-  const [removeId, setRemoveId]     = useState(null);   // id pending removal confirm
+  const [removeId, setRemoveId]     = useState(null);
+  const [error, setError]           = useState("");
 
   /* New user form state */
   const emptyForm = { firstName:"", lastName:"", staffId:"", email:"", dob:"", dept: departments[0], role:"HOD" };
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});
+
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axiosInstance.get("/users");
+      setUsers(data.data || []);
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch users");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   /* Stats */
   const totalUsers  = users.length;
@@ -100,13 +111,27 @@ export default function RoleManagementPage() {
   });
 
   /* Toggle status */
-  const toggleStatus = (id) =>
-    setUsers(prev => prev.map(u => u.id === id ? { ...u, status: u.status === "Active" ? "Inactive" : "Active" } : u));
+  const toggleStatus = async (id) => {
+    try {
+      const user = users.find(u => u._id === id);
+      if (!user) return;
+      
+      const newStatus = user.status === "Active" ? "Inactive" : "Active";
+      const endpoint = newStatus === "Active" ? `/users/${id}/activate` : `/users/${id}/deactivate`;
+      
+      const { data } = await axiosInstance.patch(endpoint);
+      setUsers(prev => prev.map(u => u._id === id ? data.data : u));
+      setSuccess(data.message || "Status updated successfully!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to update status");
+    }
+  };
 
   /* Open edit modal */
   const openEdit = (user) => {
     const [firstName, ...rest] = user.name.split(" ");
-    setForm({ firstName, lastName: rest.join(" "), staffId: user.id, email: user.email, dob: "", dept: user.dept, role: user.role });
+    setForm({ firstName, lastName: rest.join(" "), staffId: user.staffId, email: user.email, dob: user.dob || "", dept: user.department, role: user.role });
     setEditUser(user);
     setShowModal(true);
   };
@@ -122,42 +147,58 @@ export default function RoleManagementPage() {
   };
 
   /* Save */
-  const handleSave = () => {
+  const handleSave = async () => {
     const e = validate();
     if (Object.keys(e).length) { setErrors(e); return; }
 
-    const fullName   = `${form.firstName} ${form.lastName}`;
-    const initials   = `${form.firstName[0]}${form.lastName[0]}`.toUpperCase();
-    const avatarBg   = editUser ? editUser.avatarBg : "#2563EB";
-    const avatarBgs  = ["#2563EB","#8B5CF6","#F97316","#10B981","#EF4444","#06B6D4","#F59E0B"];
+    try {
+      const fullName = `${form.firstName} ${form.lastName}`;
+      const payload = {
+        name: fullName,
+        email: form.email,
+        staffId: form.staffId,
+        dob: form.dob,
+        department: form.dept,
+        role: form.role,
+      };
 
-    if (editUser) {
-      setUsers(prev => prev.map(u => u.id === editUser.id
-        ? { ...u, name: fullName, email: form.email, role: form.role, dept: form.dept, initials }
-        : u));
-      setSuccess("User updated successfully!");
-    } else {
-      const newId = `USR-${String(users.length + 1).padStart(3, "0")}`;
-      setUsers(prev => [...prev, {
-        id: newId, name: fullName, email: form.email, role: form.role,
-        dept: form.dept, status: "Active", initials,
-        avatarBg: avatarBgs[prev.length % avatarBgs.length],
-      }]);
-      setSuccess("User successfully created!");
+      if (editUser) {
+        // Update existing user
+        const { data } = await axiosInstance.put(`/users/${editUser._id}`, payload);
+        setUsers(prev => prev.map(u => u._id === editUser._id ? data.data : u));
+        setSuccess("User updated successfully!");
+      } else {
+        // Create new user
+        const { data } = await axiosInstance.post("/users", payload);
+        setUsers(prev => [...prev, data.data]);
+        setSuccess("User successfully created!");
+      }
+      
+      setForm(emptyForm);
+      setErrors({});
+      setEditUser(null);
+      setShowModal(false);
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save user");
+      console.error(err);
     }
-    setForm(emptyForm); setErrors({}); setEditUser(null); setShowModal(false);
-    setTimeout(() => setSuccess(""), 3000);
   };
 
   const openAdd = () => { setForm(emptyForm); setEditUser(null); setErrors({}); setShowModal(true); };
   const closeModal = () => { setShowModal(false); setEditUser(null); setErrors({}); setForm(emptyForm); };
 
   /* Remove user */
-  const handleRemove = (id) => {
-    setUsers(prev => prev.filter(u => u.id !== id));
-    setRemoveId(null);
-    setSuccess("User removed successfully!");
-    setTimeout(() => setSuccess(""), 3000);
+  const handleRemove = async (id) => {
+    try {
+      await axiosInstance.delete(`/users/${id}`);
+      setUsers(prev => prev.filter(u => u._id !== id));
+      setRemoveId(null);
+      setSuccess("User removed successfully!");
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to remove user");
+    }
   };
 
   return (
@@ -183,6 +224,7 @@ export default function RoleManagementPage() {
 
         {/* Success banner */}
         {success && <div className="rm-global-success">✅ {success}</div>}
+        {error && <div style={{ background: "#FEE2E2", color: "#B91C1C", border: "1px solid #FCA5A5", borderRadius: "10px", padding: "12px 20px", fontSize: "14px", fontWeight: "600", animation: "fadeIn 0.3s ease", marginBottom: "16px" }}>❌ {error}</div>}
 
         {/* Stat Cards — 3 columns */}
         <div className="role-stat-grid">
@@ -234,10 +276,15 @@ export default function RoleManagementPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.length === 0
-                ? <tr><td colSpan={7} className="no-results">No users found.</td></tr>
-                : filtered.map(u => (
-                  <tr key={u.id}>
+              {loading ? (
+                <tr><td colSpan={7} style={{ textAlign: "center", padding: "20px", color: "#9CA3AF" }}>Loading...</td></tr>
+              ) : error ? (
+                <tr><td colSpan={7} style={{ textAlign: "center", padding: "20px", color: "#EF4444" }}>{error}</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td colSpan={7} className="no-results">No users found.</td></tr>
+              ) : (
+                filtered.map(u => (
+                  <tr key={u._id}>
                     <td>
                       <div className="assignee-cell">
                         <div className="assignee-avatar" style={{ background: u.avatarBg }}>{u.initials}</div>
@@ -246,7 +293,7 @@ export default function RoleManagementPage() {
                     </td>
                     <td className="task-row-id" style={{ fontWeight: 600, color: "#374151" }}>{u.id}</td>
                     <td className="dept-cell">{u.email}</td>
-                    <td className="dept-cell">{u.dept}</td>
+                    <td className="dept-cell">{u.department}</td>
                     <td>
                       <span className={`role-badge ${u.role === "Admin" ? "role-admin" : "role-hod"}`}>
                         {u.role}
@@ -264,25 +311,26 @@ export default function RoleManagementPage() {
                         </button>
                         <button
                           className={`deactivate-btn ${u.status === "Inactive" ? "activate-btn" : ""}`}
-                          onClick={() => toggleStatus(u.id)}
+                          onClick={() => toggleStatus(u._id)}
                         >
                           <PowerIcon /> {u.status === "Active" ? "Deactivate" : "Activate"}
                         </button>
-                        {removeId === u.id ? (
+                        {removeId === u._id ? (
                           <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
                             <span style={{ fontSize: 12, color: "#B91C1C", fontWeight: 600 }}>Sure?</span>
-                            <button className="rm-confirm-delete-btn" onClick={() => handleRemove(u.id)}>Yes</button>
+                            <button className="rm-confirm-delete-btn" onClick={() => handleRemove(u._id)}>Yes</button>
                             <button className="rm-cancel-delete-btn" onClick={() => setRemoveId(null)}>No</button>
                           </div>
                         ) : (
-                          <button className="rm-remove-btn" onClick={() => setRemoveId(u.id)}>
+                          <button className="rm-remove-btn" onClick={() => setRemoveId(u._id)}>
                             <TrashIcon /> Remove
                           </button>
                         )}
                       </div>
                     </td>
                   </tr>
-                ))}
+                ))
+              )}
             </tbody>
           </table>
 

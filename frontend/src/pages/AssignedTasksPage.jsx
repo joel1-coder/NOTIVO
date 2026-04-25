@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import ViewModal from "../components/ViewModal";
+import axiosInstance from "../api/axiosInstance";
 
 /* ── Icons ─────────────────────────────────── */
 const FilterIcon = () => (
@@ -153,13 +154,34 @@ export default function AssignedTasksPage() {
   const [deptFilter, setDeptFilter] = useState("All");
   const [staffFilter, setStaffFilter] = useState("All Members");
   const [modalItem, setModalItem] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axiosInstance.get("/tasks/status/In Progress");
+      setTasks(data.data || []);
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch tasks");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = tasks.filter((t) => {
     const matchSearch =
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.id.toLowerCase().includes(search.toLowerCase());
-    const matchDept = deptFilter === "All" || t.dept === deptFilter;
-    const matchStaff = staffFilter === "All Members" || t.assignee === staffFilter;
+      (t.title || "").toLowerCase().includes(search.toLowerCase()) ||
+      (t.id || "").toLowerCase().includes(search.toLowerCase());
+    const matchDept = deptFilter === "All" || t.department === deptFilter;
+    const matchStaff = staffFilter === "All Members" || t.assignedTo === staffFilter;
     return matchSearch && matchDept && matchStaff;
   });
 
@@ -238,8 +260,8 @@ export default function AssignedTasksPage() {
             onChange={(e) => setStaffFilter(e.target.value)}
           >
             <option value="All Members">Staff: All Members</option>
-            {tasks.map((t) => (
-              <option key={t.assignee}>{t.assignee}</option>
+            {[...new Set(tasks.map((t) => t.assignedTo))].map((assignee) => (
+              <option key={assignee}>{assignee}</option>
             ))}
           </select>
           <button className="sort-btn"><SortIcon /> Sort by: Newest</button>
@@ -265,10 +287,10 @@ export default function AssignedTasksPage() {
                 </tr>
               ) : (
                 filtered.map((t) => (
-                  <tr key={t.id}>
+                  <tr key={t._id}>
                     <td>
                       <div className="task-name-col">
-                        <span className="task-row-name">{t.name}</span>
+                        <span className="task-row-name">{t.title}</span>
                         <span className="task-row-id">#{t.id}</span>
                       </div>
                     </td>
@@ -278,8 +300,8 @@ export default function AssignedTasksPage() {
                           {t.initials}
                         </div>
                         <div>
-                          <div className="assignee-name">{t.assignee}</div>
-                          <div className="assignee-dept">{t.dept}</div>
+                          <div className="assignee-name">{t.assignedTo}</div>
+                          <div className="assignee-dept">{t.department}</div>
                         </div>
                       </div>
                     </td>
@@ -293,7 +315,7 @@ export default function AssignedTasksPage() {
                         {t.status}
                       </span>
                     </td>
-                    <td className="date-cell">{t.due}</td>
+                    <td className="date-cell">{t.dueDate ? new Date(t.dueDate).toLocaleDateString() : 'N/A'}</td>
                     <td>
                       <button className="view-details-btn" onClick={() => setModalItem(t)}>
                         <EyeIcon /> View Details

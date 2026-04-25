@@ -71,6 +71,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth", require("./routes/authroutes"));
+app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/tasks", require("./routes/taskRoutes"));
 
 app.get("/", (req, res) => res.send("Admin API is running..."));
 

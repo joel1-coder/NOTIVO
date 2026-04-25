@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
 import ViewModal from "../components/ViewModal";
+import axiosInstance from "../api/axiosInstance";
 
 /* ── Icons ─────────────────────────────────── */
 const FilterIcon = () => (
@@ -168,13 +169,34 @@ export default function PendingTasksPage() {
   const [deptFilter, setDept]     = useState("All");
   const [showOverdue, setOverdue] = useState(false);
   const [modalItem, setModalItem] = useState(null);
+  const [pendingTasks, setPendingTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axiosInstance.get("/tasks/status/Pending");
+      setPendingTasks(data.data || []);
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch pending tasks");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = pendingTasks.filter((t) => {
     const matchSearch =
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.id.toLowerCase().includes(search.toLowerCase());
-    const matchDept   = deptFilter === "All" || t.dept === deptFilter;
-    const matchOver   = !showOverdue || t.overdue;
+      (t.title || "").toLowerCase().includes(search.toLowerCase()) ||
+      (t.id || "").toLowerCase().includes(search.toLowerCase());
+    const matchDept   = deptFilter === "All" || t.department === deptFilter;
+    const matchOver   = !showOverdue || (t.dueDate && new Date(t.dueDate) < new Date());
     return matchSearch && matchDept && matchOver;
   });
 
@@ -280,13 +302,16 @@ export default function PendingTasksPage() {
                   <td colSpan={6} className="no-results">No pending tasks found.</td>
                 </tr>
               ) : (
-                filtered.map((t) => (
-                  <tr key={t.id} className={t.overdue ? "overdue-row" : ""}>
+                filtered.map((t) => {
+                  const isOverdue = t.dueDate && new Date(t.dueDate) < new Date();
+                  const daysOverdue = isOverdue ? Math.floor((new Date() - new Date(t.dueDate)) / (1000 * 60 * 60 * 24)) : 0;
+                  return (
+                  <tr key={t._id} className={isOverdue ? "overdue-row" : ""}>
                     <td>
                       <div className="task-name-col">
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                          {t.overdue && <AlertIcon />}
-                          <span className="task-row-name">{t.name}</span>
+                          {isOverdue && <AlertIcon />}
+                          <span className="task-row-name">{t.title}</span>
                         </div>
                         <span className="task-row-id">#{t.id}</span>
                       </div>
@@ -297,8 +322,8 @@ export default function PendingTasksPage() {
                           {t.initials}
                         </div>
                         <div>
-                          <div className="assignee-name">{t.assignee}</div>
-                          <div className="assignee-dept">{t.dept}</div>
+                          <div className="assignee-name">{t.assignedTo}</div>
+                          <div className="assignee-dept">{t.department}</div>
                         </div>
                       </div>
                     </td>
@@ -309,19 +334,19 @@ export default function PendingTasksPage() {
                     </td>
                     <td>
                       <div className="deadline-cell">
-                        <span className={t.overdue ? "deadline-overdue" : "deadline-normal"}>
-                          {t.deadline}
+                        <span className={isOverdue ? "deadline-overdue" : "deadline-normal"}>
+                          {t.dueDate ? new Date(t.dueDate).toLocaleDateString() : 'N/A'}
                         </span>
-                        {t.overdue && (
+                        {isOverdue && (
                           <span className="overdue-chip">
-                            {t.daysOverdue}d overdue
+                            {daysOverdue}d overdue
                           </span>
                         )}
                       </div>
                     </td>
                     <td>
-                      <span className={`task-status-badge ${t.overdue ? "status-overdue" : "status-pending-badge"}`}>
-                        {t.overdue ? "OVERDUE" : "PENDING"}
+                      <span className={`task-status-badge ${isOverdue ? "status-overdue" : "status-pending-badge"}`}>
+                        {isOverdue ? "OVERDUE" : "PENDING"}
                       </span>
                     </td>
                     <td>
@@ -330,7 +355,8 @@ export default function PendingTasksPage() {
                       </button>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>

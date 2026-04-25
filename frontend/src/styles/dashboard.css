@@ -136,6 +136,9 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   z-index: 99;
   animation: slideDown 0.3s ease;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 .mobile-nav-menu.open {
   display: flex;
@@ -149,6 +152,11 @@ body {
   color: #6B7280;
   text-decoration: none;
   transition: background 0.2s, color 0.2s;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 .mobile-nav-item:hover,
 .mobile-nav-item.active {
@@ -863,5 +871,94 @@ body {
     white-space: nowrap;
     padding: 6px 4px;
     font-size: 10px;
+  }
+}
+
+/* Extra Small Mobile (< 400px) */
+@media (max-width: 400px) {
+  .top-navbar {
+    gap: 8px;
+    padding: 0 8px;
+    height: 52px;
+  }
+  
+  .hamburger-btn {
+    width: 32px;
+    height: 32px;
+    padding: 4px;
+    margin-right: 4px;
+  }
+  
+  .hamburger-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .navbar-logo svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .logo-title {
+    font-size: 10px;
+  }
+  
+  .logo-sub {
+    font-size: 7px;
+  }
+  
+  .bell-btn {
+    padding: 4px;
+  }
+  
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+  
+  .bell-badge {
+    width: 14px;
+    height: 14px;
+    font-size: 8px;
+  }
+  
+  .layout-main {
+    padding: 12px 8px;
+  }
+  
+  .mobile-nav-item {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+  
+  .dash-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .dash-stat-card {
+    padding: 14px 12px;
+  }
+  
+  .stat-label {
+    font-size: 11px;
+  }
+  
+  .stat-value {
+    font-size: 20px;
+    margin: 4px 0;
+  }
+  
+  .card-nav-hint {
+    font-size: 10px;
+  }
+  
+  .dash-title {
+    font-size: 20px;
+  }
+  
+  .dash-subtitle {
+    font-size: 11px;
   }
 }

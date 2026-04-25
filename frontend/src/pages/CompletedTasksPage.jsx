@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import axiosInstance from "../api/axiosInstance";
 
 /* ── Icons ──────────────────────────────────── */
 const ChevronRight = () => (
@@ -109,13 +110,34 @@ export default function CompletedTasksPage() {
   const [search, setSearch]       = useState("");
   const [deptFilter, setDept]     = useState("All");
   const [staffFilter, setStaff]   = useState("All Members");
+  const [completedTasks, setCompletedTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axiosInstance.get("/tasks/status/Completed");
+      setCompletedTasks(data.data || []);
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch completed tasks");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = completedTasks.filter((t) => {
     const matchSearch =
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.id.toLowerCase().includes(search.toLowerCase());
-    const matchDept  = deptFilter  === "All"         || t.dept     === deptFilter;
-    const matchStaff = staffFilter === "All Members"  || t.assignee === staffFilter;
+      (t.title || "").toLowerCase().includes(search.toLowerCase()) ||
+      (t.id || "").toLowerCase().includes(search.toLowerCase());
+    const matchDept  = deptFilter  === "All"         || t.department     === deptFilter;
+    const matchStaff = staffFilter === "All Members"  || t.assignedTo === staffFilter;
     return matchSearch && matchDept && matchStaff;
   });
 
@@ -167,8 +189,8 @@ export default function CompletedTasksPage() {
           <select className="tasks-select" value={staffFilter}
             onChange={(e) => setStaff(e.target.value)}>
             <option value="All Members">Staff: All Members</option>
-            {completedTasks.map((t) => (
-              <option key={t.assignee}>{t.assignee}</option>
+            {[...new Set(completedTasks.map((t) => t.assignedTo))].map((assignee) => (
+              <option key={assignee}>{assignee}</option>
             ))}
           </select>
         </div>
@@ -193,10 +215,10 @@ export default function CompletedTasksPage() {
                 </tr>
               ) : (
                 filtered.map((t) => (
-                  <tr key={t.id} className="completed-row">
+                  <tr key={t._id} className="completed-row">
                     <td>
                       <div className="task-name-col">
-                        <span className="task-row-name">{t.name}</span>
+                        <span className="task-row-name">{t.title}</span>
                         <span className="task-row-id">#{t.id}</span>
                       </div>
                     </td>
@@ -205,7 +227,7 @@ export default function CompletedTasksPage() {
                         <div className="assignee-avatar" style={{ background: t.avatarBg }}>
                           {t.initials}
                         </div>
-                        <span className="assignee-name">{t.assignee}</span>
+                        <span className="assignee-name">{t.assignedTo}</span>
                       </div>
                     </td>
                     <td className="dept-cell">{t.dept}</td>

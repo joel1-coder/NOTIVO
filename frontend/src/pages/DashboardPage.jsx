@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Layout from "../components/Layout";
+import axiosInstance from "../api/axiosInstance";
 
 /* ── Icons ─────────────────────────────────────────────── */
 const CheckIcon = () => (
@@ -50,57 +51,7 @@ const TrendDownIcon = () => (
   </svg>
 );
 
-/* ── Data ────────────────────────────────────────────────── */
-const stats = [
-  {
-    label: "Completed Tasks",
-    value: "1,284",
-    change: "+12.5%",
-    positive: true,
-    iconColor: "#22c55e",
-    iconBg: "rgba(34,197,94,0.12)",
-    barColor: "#22c55e",
-    barWidth: "78%",
-    Icon: CheckIcon,
-    link: "/tasks/completed",
-  },
-  {
-    label: "Incomplete Tasks",
-    value: "156",
-    change: "-5.2%",
-    positive: false,
-    iconColor: "#ef4444",
-    iconBg: "rgba(239,68,68,0.12)",
-    barColor: "#ef4444",
-    barWidth: "20%",
-    Icon: XIcon,
-    link: "/tasks/incomplete",
-  },
-  {
-    label: "Assigned to Staff",
-    value: "432",
-    change: "+8.1%",
-    positive: true,
-    iconColor: "#3b82f6",
-    iconBg: "rgba(59,130,246,0.12)",
-    barColor: "#3b82f6",
-    barWidth: "52%",
-    Icon: UsersIcon,
-    link: "/tasks/assigned",
-  },
-  {
-    label: "Pending Tasks",
-    value: "1,872",
-    change: "+15%",
-    positive: false,
-    iconColor: "#f59e0b",
-    iconBg: "rgba(245,158,11,0.12)",
-    barColor: "#f59e0b",
-    barWidth: "90%",
-    Icon: ClockIcon,
-    link: "/tasks/pending",
-  },
-];
+
 
 const activities = [
   { id:1, task:"UI Design System",      assignee:"Alex Rivera",    initials:"AR", avatarBg:"#f97316", status:"Completed",   statusClass:"badge-completed",  date:"Oct 24, 2023", dept:"Design" },
@@ -131,6 +82,78 @@ export default function DashboardPage() {
   const { admin } = useAuth();
   const navigate = useNavigate();
   const [hoveredStat, setHoveredStat] = useState(null);
+  const [taskStats, setTaskStats] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axiosInstance.get("/tasks/stats");
+      setTaskStats(data.data || {});
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch statistics");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dynamicStats = [
+    {
+      label: "Completed Tasks",
+      value: String(taskStats.completed || 0),
+      change: "+12.5%",
+      positive: true,
+      iconColor: "#22c55e",
+      iconBg: "rgba(34,197,94,0.12)",
+      barColor: "#22c55e",
+      barWidth: `${Math.min(100, ((taskStats.completed || 0) / (taskStats.total || 1)) * 100)}%`,
+      Icon: CheckIcon,
+      link: "/tasks/completed",
+    },
+    {
+      label: "Incomplete Tasks",
+      value: String(taskStats.incomplete || 0),
+      change: "-5.2%",
+      positive: false,
+      iconColor: "#ef4444",
+      iconBg: "rgba(239,68,68,0.12)",
+      barColor: "#ef4444",
+      barWidth: `${Math.min(100, ((taskStats.incomplete || 0) / (taskStats.total || 1)) * 100)}%`,
+      Icon: XIcon,
+      link: "/tasks/incomplete",
+    },
+    {
+      label: "In Progress",
+      value: String(taskStats.inProgress || 0),
+      change: "+8.1%",
+      positive: true,
+      iconColor: "#3b82f6",
+      iconBg: "rgba(59,130,246,0.12)",
+      barColor: "#3b82f6",
+      barWidth: `${Math.min(100, ((taskStats.inProgress || 0) / (taskStats.total || 1)) * 100)}%`,
+      Icon: UsersIcon,
+      link: "/tasks/assigned",
+    },
+    {
+      label: "Pending Tasks",
+      value: String(taskStats.pending || 0),
+      change: "+15%",
+      positive: false,
+      iconColor: "#f59e0b",
+      iconBg: "rgba(245,158,11,0.12)",
+      barColor: "#f59e0b",
+      barWidth: `${Math.min(100, ((taskStats.pending || 0) / (taskStats.total || 1)) * 100)}%`,
+      Icon: ClockIcon,
+      link: "/tasks/pending",
+    },
+  ];
 
   return (
     <Layout>
@@ -158,7 +181,7 @@ export default function DashboardPage() {
 
         {/* Stat Cards */}
         <div className="dash-cards-grid">
-          {stats.map((s) => (
+          {dynamicStats.map((s) => (
             <div
               key={s.label}
               className="dash-stat-card"

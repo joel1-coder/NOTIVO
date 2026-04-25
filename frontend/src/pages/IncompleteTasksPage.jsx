@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "../components/Layout";
+import axiosInstance from "../api/axiosInstance";
 
 /* ── Icons ──────────────────────────────────── */
 const ChevronRight = () => (
@@ -176,13 +177,34 @@ export default function IncompleteTasksPage() {
   const [search, setSearch]     = useState("");
   const [reasonFilter, setReason] = useState("All");
   const [deptFilter, setDept]   = useState("All");
+  const [incompleteTasks, setIncompleteTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axiosInstance.get("/tasks/status/Incomplete");
+      setIncompleteTasks(data.data || []);
+      setError("");
+    } catch (err) {
+      setError("Failed to fetch incomplete tasks");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filtered = incompleteTasks.filter((t) => {
     const matchSearch =
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.id.toLowerCase().includes(search.toLowerCase());
+      (t.title || "").toLowerCase().includes(search.toLowerCase()) ||
+      (t.id || "").toLowerCase().includes(search.toLowerCase());
     const matchReason = reasonFilter === "All" || t.reason === reasonFilter;
-    const matchDept   = deptFilter   === "All" || t.dept   === deptFilter;
+    const matchDept   = deptFilter   === "All" || t.department   === deptFilter;
     return matchSearch && matchReason && matchDept;
   });
 
@@ -290,10 +312,10 @@ export default function IncompleteTasksPage() {
                 </tr>
               ) : (
                 filtered.map((t) => (
-                  <tr key={t.id} className="incomplete-row">
+                  <tr key={t._id} className="incomplete-row">
                     <td>
                       <div className="task-name-col">
-                        <span className="task-row-name">{t.name}</span>
+                        <span className="task-row-name">{t.title}</span>
                         <span className="task-row-id">#{t.id}</span>
                       </div>
                     </td>
@@ -303,8 +325,8 @@ export default function IncompleteTasksPage() {
                           {t.initials}
                         </div>
                         <div>
-                          <div className="assignee-name">{t.assignee}</div>
-                          <div className="assignee-dept">{t.dept}</div>
+                          <div className="assignee-name">{t.assignedTo}</div>
+                          <div className="assignee-dept">{t.department}</div>
                         </div>
                       </div>
                     </td>
